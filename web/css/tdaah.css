@@ -1,0 +1,30 @@
+/* TDAAH UI © Kevin Marville — kvnbbg.fr · techandstream.com · kvnbbg-creations.io */
+:root{--bg:#0c0614;--bg-card:#1c1528;--line:rgba(255,255,255,.08);--text:#f6f1ea;--muted:#a89cb6;--accent:#ff6a2a;--accent-2:#ff8a4d;--ok:#3dd68c;--err:#ff6b7a;--radius:22px;--shadow:0 24px 60px rgba(0,0,0,.35);--font:"Segoe UI","Helvetica Neue",system-ui,sans-serif}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{font-family:var(--font);background:radial-gradient(900px 420px at 10% -10%,rgba(255,106,42,.16),transparent 55%),radial-gradient(700px 380px at 100% 0%,rgba(90,40,140,.28),transparent 50%),var(--bg);color:var(--text);line-height:1.5}
+.watermark{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.045' stroke-width='1.2'%3E%3Ccircle cx='110' cy='110' r='78'/%3E%3Ccircle cx='110' cy='110' r='52'/%3E%3Cpath d='M110 18 L110 202 M18 110 L202 110 M48 48 L172 172 M172 48 L48 172'/%3E%3C/g%3E%3C/svg%3E");background-repeat:repeat}
+.watermark-label{position:fixed;right:18px;bottom:16px;z-index:5;pointer-events:none;color:rgba(255,255,255,.28);font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.wrap{position:relative;z-index:1;width:min(1120px,calc(100% - 32px));margin:0 auto;padding:22px 0 80px}
+header.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0 26px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.mark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(180deg,var(--accent),#c94412);color:#1a0b06;font-weight:800}
+.brand small{display:block;color:var(--muted);font-size:12px}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links a,.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;padding:9px 14px;text-decoration:none;color:var(--text);border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:13px}
+.btn-accent,.links a.cta{background:var(--accent);border-color:transparent;color:#2a1006;font-weight:700}
+.hero,.card{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 40%),var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero{padding:32px 28px;margin-bottom:18px}
+.kicker{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:5px 10px;color:var(--accent-2);font-size:12px}
+h1,h2{letter-spacing:-.03em}h1{font-size:clamp(2rem,4vw,3.2rem);margin:14px 0 8px}h2{font-size:1.35rem;margin:0 0 10px}p.lead{color:var(--muted);max-width:62ch}
+.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.card{padding:22px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+input,select,textarea{width:100%;border-radius:14px;border:1px solid var(--line);background:#110c18;color:var(--text);padding:12px 13px;font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}.btn{cursor:pointer}button.btn{font:inherit}
+.result{margin-top:16px;padding:16px;border-radius:16px;background:#110c18;border:1px solid var(--line);min-height:72px}
+.result strong{font-size:1.6rem;display:block}.result.error{border-color:rgba(255,107,122,.45);color:var(--err)}.result.ok{border-color:rgba(61,214,140,.3)}
+.history{margin-top:12px;color:var(--muted);font-size:13px}
+.side-list{display:grid;gap:10px}.side-list a{color:var(--text);text-decoration:none;border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:#140e1d}.side-list a span{display:block;color:var(--muted);font-size:12px}
+.versions{display:grid;gap:10px}.version{border:1px solid var(--line);border-radius:16px;padding:14px;background:#140e1d}.version b{display:block}
+footer{margin-top:28px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:18px}footer a{color:var(--accent-2)}
+@media(max-width:860px){.grid,.row{grid-template-columns:1fr}header.nav{flex-direction:column;align-items:flex-start}}

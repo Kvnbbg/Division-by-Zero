@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TDAAH — Division by Zero | Kevin Marville</title>
+  <meta name="description" content="TDAAH, appareil de mesure métrique et conversion. Interface Tech & Stream par Kevin Marville.">
+  <meta name="author" content="Kevin Marville">
+  <link rel="stylesheet" href="css/tdaah.css">
+</head>
+<body>
+  <div class="watermark" aria-hidden="true"></div>
+  <div class="watermark-label">© Kevin Marville · Tech &amp; Stream</div>
+  <div class="wrap">
+    <header class="nav">
+      <a class="brand" href="index.html">
+        <div class="mark">T/</div>
+        <div>TDAAH<small>Division by Zero · mesure &amp; conversion</small></div>
+      </a>
+      <nav class="links">
+        <a href="index.html">Appareil</a>
+        <a href="silence-et-respect.html">Silence et Respect</a>
+        <a href="https://techandstream.com" rel="noopener">techandstream.com</a>
+        <a href="https://kvnbbg.fr" rel="noopener">kvnbbg.fr</a>
+        <a class="cta" href="https://kvnbbg-creations.io" rel="noopener">Streams</a>
+      </nav>
+    </header>
+    <section class="hero">
+      <div class="kicker">App by design · CSS then JavaScript</div>
+      <h1>Appareil de mesure métrique.</h1>
+      <p class="lead">TDAAH convertit les grandeurs et calcule entre unités. L’interface est conçue d’abord en CSS, puis animée en JavaScript. Division par zéro interceptée. Filigrane © Kevin Marville.</p>
+    </section>
+    <div class="grid">
+      <section class="card">
+        <h2>Convertir</h2>
+        <div class="row">
+          <div><label for="value">Valeur</label><input id="value" type="number" step="any" value="100"></div>
+          <div><label for="srcUnit">De</label><select id="srcUnit"></select></div>
+          <div><label for="dstUnit">Vers</label><select id="dstUnit"></select></div>
+        </div>
+        <div class="actions"><button class="btn btn-accent" id="btnConvert" type="button">Convertir</button></div>
+        <div class="result" id="convertOut"><span>Résultat de conversion</span></div>
+        <h2 style="margin-top:22px">Calculer</h2>
+        <label for="expr">Expression</label>
+        <input id="expr" value="10 km / 2 h">
+        <div class="actions"><button class="btn btn-accent" id="btnCalc" type="button">Évaluer</button></div>
+        <div class="result" id="calcOut"><span>Essayez 5 m / 0 s</span></div>
+        <ul class="history" id="history"></ul>
+      </section>
+      <aside class="card">
+        <h2>UI / UX &amp; flux</h2>
+        <div class="side-list">
+          <a href="https://techandstream.com" rel="noopener">Tech &amp; Stream<span>Direction produit et design commercial.</span></a>
+          <a href="https://kvnbbg.fr" rel="noopener">kvnbbg.fr<span>Portfolio ingénierie full-stack &amp; LLM.</span></a>
+          <a href="https://kvnbbg-creations.io" rel="noopener">kvnbbg-creations.io<span>La Bobine — streams et studio.</span></a>
+          <a href="silence-et-respect.html">Silence et Respect<span>Versions du morceau et consignes NFT.</span></a>
+        </div>
+      </aside>
+    </div>
+    <footer><p>© Kevin Marville. Marques TDAAH, Tech &amp; Stream, Kvnbbg. Code Apache-2.0. Identité, musique, visuels et filigranes protégés. contact@techandstream.com</p></footer>
+  </div>
+  <script src="js/convertisseur.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

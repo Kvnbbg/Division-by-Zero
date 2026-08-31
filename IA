@@ -1,0 +1,34 @@
+Actuator n’enregistre pas les métriques lui-même. Il publie les meters Micrometer : un MeterRegistry composite est auto-configuré, puis exposé pour le diagnostic et pour les collecteurs.
+Deux portes d’entrée
+Endpoint
+Rôle
+GET /actuator/metrics
+Inventaire JSON des noms de meters
+GET /actuator/metrics/{nom}
+Une série, avec forage tag=clé:valeur
+GET /actuator/prometheus
+Export texte Prometheus / OpenMetrics (dépendance micrometer-registry-prometheus)
+Sur /metrics, on utilise le nom du code (jvm.memory.max). Prometheus le normalise en jvm_memory_max_bytes. Les deux formes ne sont pas interchangeables. La valeur renvoyée est la somme des séries qui correspondent au nom et aux tags ; pour isoler un pool mémoire, ajouter un second tag (tag=id:Metaspace).
+Sans configuration, seuls health et info sont ouverts en HTTP. Il faut exposer explicitement metrics et prometheus. Éviter include: "*" en production.
+Ce qui est fourni sans code métier
+	•	JVM : jvm.memory.used, jvm.memory.max, jvm.gc.pause, jvm.threads.live
+	•	Processus / hôte : process.uptime, process.cpu.usage, system.cpu.usage, disk.free
+	•	Démarrage : application.started.time, application.ready.time
+	•	HTTP serveur : http.server.requests (nombre, durée cumulée, max ; tags method, uri, status, outcome, exception)
+	•	Plus tard : http.client.requests (appels LLM), jdbc.connections.* (persistance)
+http.server.requests est un timer d’observation, pas un simple compteur.
+Application à TDAAH
+L’agent expose désormais health, info, metrics et prometheus, avec les tags communs application=tdaah-agent et author=kevin-marville, et des histogrammes HTTP (p50 / p95 / p99).
+Compteurs métier dans TdaahMetricsConfig :
+	•	tdaah.conversions — conversions abouties
+	•	tdaah.calculations — expressions évaluées
+	•	tdaah.zero.division — à incrémenter lorsque la garde HTTP 422 se déclenche
+	•	tdaah.agent.invocations — passages par l’orchestrateur
+Surveillances utiles : le ratio jvm.memory.used{area="heap"} / jvm.memory.max, le p95 de /v1/calc, et les pics de tdaah.zero.division.
+Exploitation
+Réserver le JSON /actuator/metrics à un port de management. Laisser Prometheus interroger uniquement /actuator/prometheus. Laisser env, beans et heapdump fermés.
+Vérification locale après mvn spring-boot:run :
+curl -s localhost:8080/actuator/metrics
+curl -s localhost:8080/actuator/metrics/jvm.memory.used
+curl -s localhost:8080/actuator/prometheus | head
+Le détail rédigé se trouve dans docs/ACTUATOR-METRICS.md.

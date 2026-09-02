@@ -16,7 +16,7 @@ const SI_FOR={[DIM.L.join()]:"m",[DIM.M.join()]:"kg",[DIM.T.join()]:"s",[DIM.I.j
 function measure(value,unitName){return{value:Number(value),unit:lookup(unitName)}}
 function siOf(m){return toSI(m.value,m.unit)}
 function unitForDim(dim){const symbol=SI_FOR[dim.join()]||"1";return BY[symbol.toLowerCase()]||{symbol,dim,factor:1,offset:0}}
-function calculate(expr){const tokens=String(expr).trim().match(/[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?|[A-Za-zµ°Ω][A-Za-z0-9µ°Ω/\u00b2\u00b32-3]*|[()+\-*/]/gi);if(!tokens)throw new UnitError("expression vide.");const merged=[];for(let i=0;i<tokens.length;i+=1){const t=tokens[i];if(/^[+-]?(?:\d|\.)/.test(t)&&i+1<tokens.length&&/^[A-Za-zµ°Ω]/.test(tokens[i+1])){merged.push(measure(t,tokens[i+1]));i+=1}else if(/^[+-]?(?:\d|\.)/.test(t)){merged.push({value:Number(t),unit:{symbol:"1",dim:DIM.none,factor:1,offset:0}})}else merged.push(t)}
+function calculate(expr){const tokens=String(expr).trim().match(/[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?|[A-Za-zµ°Ω][A-Za-z0-9µ°Ω/\u00b2\u00b3]*|[()+\-*/]/gi);if(!tokens)throw new UnitError("expression vide.");const merged=[];for(let i=0;i<tokens.length;i+=1){const t=tokens[i];if(/^[+-]?(?:\d|\.)/.test(t)&&i+1<tokens.length&&/^[A-Za-zµ°Ω]/.test(tokens[i+1])){merged.push(measure(t,tokens[i+1]));i+=1}else if(/^[+-]?(?:\d|\.)/.test(t)){merged.push({value:Number(t),unit:{symbol:"1",dim:DIM.none,factor:1,offset:0}})}else merged.push(t)}
 const add=(x,y)=>{if(!sameDim(x.unit.dim,y.unit.dim))throw new UnitError("dimensions incompatibles pour +/\u2212.");return{value:fromSI(siOf(x)+siOf(y),x.unit),unit:x.unit}};
 const sub=(x,y)=>add(x,{value:-y.value,unit:y.unit});
 const mul=(x,y)=>{const unit=unitForDim(addDim(x.unit.dim,y.unit.dim));return{value:fromSI(siOf(x)*siOf(y),unit),unit}};

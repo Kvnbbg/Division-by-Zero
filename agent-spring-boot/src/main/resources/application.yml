@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: tdaah-agent
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  info:
+    env:
+      enabled: true
+info:
+  app:
+    author: Kevin Marville
+    brand: Tech & Stream
+    site: https://techandstream.com

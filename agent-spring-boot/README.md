@@ -61,8 +61,42 @@ Vérifié sur les mêmes entrées, au dernier chiffre près :
 
 ## Le refus
 
-`ZeroDivisionMeasurementException` refuse une division dont le dénominateur vaut
-zéro **en SI**. Nuance qui compte : `0 °C` n'est pas une mesure nulle — c'est
-273,15 K — et le rapport existe donc. Seul un dénominateur réellement nul est
-refusé, avec un `422` : la demande est recevable, le résultat n'existe pas. Un
-`500` laisserait croire à une panne du service.
+L'invariant tient en une phrase : **aucune valeur non finie ne sort de `Units`.**
+Ni `Infinity`, ni `NaN`, ni un zéro « par commodité ».
+
+Trois portes, et non une seule — c'est l'élargissement de ce correctif :
+
+| Cas | Refus | Code |
+| --- | --- | --- |
+| Dénominateur nul **en SI** | `ZeroDivisionMeasurementException` | `422` |
+| Résultat qui déborde (`ratio`, `convert`) | `ZeroDivisionMeasurementException` | `422` |
+| Valeur d'entrée `NaN` / `Infinity` | `UnitException` | `400` |
+
+Nuance qui compte : `0 °C` n'est pas une mesure nulle — c'est 273,15 K — et le
+rapport existe donc. Le refus porte sur la valeur **en SI**, pas sur celle qui a
+été saisie.
+
+Pourquoi `422` pour un débordement : la demande est recevable, le résultat
+n'existe pas. Un `500` laisserait croire à une panne du service. Et pourquoi
+`400` pour une entrée non finie : c'est la saisie qui est fautive, pas la
+question — `AgentController.asDouble()` s'appuie sur `Double.parseDouble()`, qui
+accepte volontiers les chaînes `"NaN"` et `"Infinity"`.
+
+Le piège que ce correctif ferme : `clean()` rend **délibérément** les valeurs non
+finies telles quelles, et ne peut donc pas servir de dernière ligne de défense.
+Tant que le refus était écrit à la main dans `ratio()` seul, `convert()` rendait
+`Infinity` sans que rien ne l'arrête — et Jackson le sérialisait en la *chaîne*
+JSON `"Infinity"`, si bien qu'un agent appelant recevait du texte là où son
+schéma annonçait un nombre. Le refus est désormais concentré dans
+`requireFinite()` et `requireRepresentable()` : une opération nouvelle qui
+oublierait de les appeler est un oubli visible, pas un trou silencieux.
+
+## Tests
+
+Les deux implémentations doivent refuser dans les mêmes cas, donc les deux
+suites se lancent :
+
+```
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 mvn test   # 16 tests, depuis agent-spring-boot/
+npm test                                                # 12 tests, depuis la racine
+```

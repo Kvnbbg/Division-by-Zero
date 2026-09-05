@@ -151,6 +151,48 @@ public final class Units {
         return n;
     }
 
+    /**
+     * Refuse une valeur d'entrée non finie, avant tout calcul.
+     *
+     * <p>{@code AgentController.asDouble()} s'appuie sur
+     * {@link Double#parseDouble(String)}, qui accepte les chaînes {@code "NaN"},
+     * {@code "Infinity"} et {@code "-Infinity"} : un appelant peut donc injecter
+     * du non-fini par le corps de la requête. Propagé, un NaN contamine
+     * silencieusement tout calcul en aval — et NaN != NaN, donc même une
+     * comparaison de contrôle échoue à le détecter.
+     *
+     * <p>C'est une requête fautive, pas un résultat manquant : d'où
+     * {@link UnitException} (400) et non {@link ZeroDivisionMeasurementException}
+     * (422). L'appelant doit corriger sa saisie, pas sa question.
+     */
+    private static double requireFinite(double value, String role) {
+        if (!Double.isFinite(value)) {
+            throw new UnitException("valeur " + role + " non finie : " + value + ".");
+        }
+        return value;
+    }
+
+    /**
+     * Refuse un résultat que le double ne peut pas représenter.
+     *
+     * <p>Point unique de sortie pour l'invariant du projet : aucune valeur non
+     * finie ne franchit cette classe. {@link #clean(double)} ne peut pas jouer
+     * ce rôle — c'est un raboteur de bruit flottant, appelé aussi sur des
+     * résultats intermédiaires, et il rend délibérément les non-finis tels
+     * quels. Concentrer le refus ici évite d'avoir à le réécrire à chaque
+     * opération, et donc d'en oublier une : c'est exactement ce qui était
+     * arrivé à {@code convert()} quand seul {@code ratio()} avait été corrigé.
+     */
+    private static double requireRepresentable(double result, String operation) {
+        if (!Double.isFinite(result)) {
+            throw new ZeroDivisionMeasurementException(
+                    "résultat non représentable (dépassement de capacité) lors de " + operation
+                            + " : les valeurs sont valides, mais leur combinaison sort de "
+                            + "l'intervalle des nombres flottants.");
+        }
+        return result;
+    }
+
     /** Convertit entre deux unités de MÊME dimension. */
     public static Converted convert(double value, String from, String to) {
         Unit source = lookup(from);
@@ -159,7 +201,10 @@ public final class Units {
             throw new UnitException(
                     "conversion impossible : " + source.symbol() + " vers " + target.symbol() + ".");
         }
-        return new Converted(clean(fromSi(toSi(value, source), target)), target.symbol());
+        requireFinite(value, "à convertir");
+        double result = fromSi(toSi(value, source), target);
+        requireRepresentable(result, "la conversion " + source.symbol() + " vers " + target.symbol());
+        return new Converted(clean(result), target.symbol());
     }
 
     /**
@@ -200,6 +245,8 @@ public final class Units {
             throw new UnitException(
                     "rapport impossible : " + a.symbol() + " et " + b.symbol() + " n'ont pas la même dimension.");
         }
+        requireFinite(numerator, "au numérateur");
+        requireFinite(denominator, "au dénominateur");
         double bottom = toSi(denominator, b);
         if (bottom == 0d) {
             throw new ZeroDivisionMeasurementException();

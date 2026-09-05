@@ -11,19 +11,25 @@ function lookup(name){const u=BY[String(name).trim().toLowerCase()];if(!u)throw 
 function toSI(value,unit){return value*unit.factor+unit.offset}
 function fromSI(si,unit){return (si-unit.offset)/unit.factor}
 function clean(n){if(!Number.isFinite(n))return n;if(Math.abs(n)<1e-12)return 0;const nearest=Math.round(n);if(nearest!==0&&Math.abs(n-nearest)<1e-10)return nearest;return n}
-function convert(value,src,dst){const a=lookup(src),b=lookup(dst);if(!sameDim(a.dim,b.dim))throw new UnitError(`conversion impossible : ${a.symbol} vers ${b.symbol}.`);return{value:clean(fromSI(toSI(Number(value),a),b)),unit:b.symbol}}
+// Miroir de Units.requireFinite / Units.requireRepresentable (agent-spring-boot).
+// clean() ne peut pas tenir ce rôle : il rend délibérément les non-finis tels quels.
+function requireFinite(n,role){if(!Number.isFinite(n))throw new UnitError(`valeur ${role} non finie : ${n}.`);return n}
+function requireRepresentable(n,op){if(!Number.isFinite(n))throw new ZeroDivisionMeasurementError(`résultat non représentable (dépassement de capacité) lors de ${op} : les valeurs sont valides, mais leur combinaison sort de l'intervalle des nombres flottants.`);return n}
+function convert(value,src,dst){const a=lookup(src),b=lookup(dst);if(!sameDim(a.dim,b.dim))throw new UnitError(`conversion impossible : ${a.symbol} vers ${b.symbol}.`);const v=requireFinite(Number(value),"à convertir");const result=fromSI(toSI(v,a),b);requireRepresentable(result,`la conversion ${a.symbol} vers ${b.symbol}`);return{value:clean(result),unit:b.symbol}}
 const SI_FOR={[DIM.L.join()]:"m",[DIM.M.join()]:"kg",[DIM.T.join()]:"s",[DIM.I.join()]:"A",[DIM.Th.join()]:"K",[DIM.area.join()]:"m2",[DIM.vol.join()]:"L",[DIM.speed.join()]:"km/h",[DIM.energy.join()]:"J",[DIM.power.join()]:"W",[DIM.pressure.join()]:"Pa",[DIM.force.join()]:"N",[DIM.none.join()]:""};
-function measure(value,unitName){return{value:Number(value),unit:lookup(unitName)}}
+function measure(value,unitName){return{value:requireFinite(Number(value),"de mesure"),unit:lookup(unitName)}}
 function siOf(m){return toSI(m.value,m.unit)}
 function unitForDim(dim){const symbol=SI_FOR[dim.join()]||"1";return BY[symbol.toLowerCase()]||{symbol,dim,factor:1,offset:0}}
 function calculate(expr){const tokens=String(expr).trim().match(/[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?|[A-Za-zµ°Ω][A-Za-z0-9µ°Ω/\u00b2\u00b3]*|[()+\-*/]/gi);if(!tokens)throw new UnitError("expression vide.");const merged=[];for(let i=0;i<tokens.length;i+=1){const t=tokens[i];if(/^[+-]?(?:\d|\.)/.test(t)&&i+1<tokens.length&&/^[A-Za-zµ°Ω]/.test(tokens[i+1])){merged.push(measure(t,tokens[i+1]));i+=1}else if(/^[+-]?(?:\d|\.)/.test(t)){merged.push({value:Number(t),unit:{symbol:"1",dim:DIM.none,factor:1,offset:0}})}else merged.push(t)}
-const add=(x,y)=>{if(!sameDim(x.unit.dim,y.unit.dim))throw new UnitError("dimensions incompatibles pour +/\u2212.");return{value:fromSI(siOf(x)+siOf(y),x.unit),unit:x.unit}};
+const add=(x,y)=>{if(!sameDim(x.unit.dim,y.unit.dim))throw new UnitError("dimensions incompatibles pour +/\u2212.");return{value:requireRepresentable(fromSI(siOf(x)+siOf(y),x.unit),"une addition"),unit:x.unit}};
 const sub=(x,y)=>add(x,{value:-y.value,unit:y.unit});
-const mul=(x,y)=>{const unit=unitForDim(addDim(x.unit.dim,y.unit.dim));return{value:fromSI(siOf(x)*siOf(y),unit),unit}};
+const mul=(x,y)=>{const unit=unitForDim(addDim(x.unit.dim,y.unit.dim));return{value:requireRepresentable(fromSI(siOf(x)*siOf(y),unit),"une multiplication"),unit}};
 const div=(x,y)=>{const bottom=siOf(y);if(bottom===0)throw new ZeroDivisionMeasurementError();const result=siOf(x)/bottom;if(!Number.isFinite(result))throw new ZeroDivisionMeasurementError("résultat non représentable (dépassement de capacité) : le dénominateur n'est pas nul, mais trop petit face au numérateur pour produire un rapport fini.");const unit=unitForDim(subDim(x.unit.dim,y.unit.dim));return{value:fromSI(result,unit),unit}};
 function parseExpr(pos){let [left,i]=parseTerm(pos);while(i<merged.length&&(merged[i]==="+"||merged[i]==="-")){const op=merged[i];const [right,j]=parseTerm(i+1);left=op==="+"?add(left,right):sub(left,right);i=j}return[left,i]}
 function parseTerm(pos){let [left,i]=parseFactor(pos);while(i<merged.length&&(merged[i]==="*"||merged[i]==="/")){const op=merged[i];const [right,j]=parseFactor(i+1);left=op==="*"?mul(left,right):div(left,right);i=j}return[left,i]}
 function parseFactor(pos){if(pos>=merged.length)throw new UnitError("expression incomplète.");const tok=merged[pos];if(tok==="+")return parseFactor(pos+1);if(tok==="-"){const [v,i]=parseFactor(pos+1);return[{value:-v.value,unit:v.unit},i]}if(tok==="("){const [v,i]=parseExpr(pos+1);if(merged[i]!==")")throw new UnitError("parenthèse fermante manquante.");return[v,i+1]}if(tok&&typeof tok==="object")return[tok,pos+1];throw new UnitError(`facteur inattendu : ${tok}`)}
 const [result,end]=parseExpr(0);if(end!==merged.length)throw new UnitError("expression mal formée.");return{value:clean(result.value),unit:result.unit.symbol}}
 function unitSymbols(){return UNITS.map(u=>u[0])}
-window.TDAAH={convert,calculate,unitSymbols,UnitError,ZeroDivisionMeasurementError};
+const TDAAH={convert,calculate,unitSymbols,UnitError,ZeroDivisionMeasurementError};
+if(typeof window!=="undefined")window.TDAAH=TDAAH;
+if(typeof module!=="undefined"&&module.exports)module.exports=TDAAH;

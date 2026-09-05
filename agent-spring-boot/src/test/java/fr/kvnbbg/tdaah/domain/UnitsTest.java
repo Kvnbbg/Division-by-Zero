@@ -119,4 +119,59 @@ class UnitsTest {
         assertEquals("température", Units.explain("C").get("dimension"));
         assertEquals(273.15d, Units.explain("C").get("siOffset"));
     }
+
+    @Test
+    @DisplayName("refuse une conversion qui déborde en Infinity — le refus ne portait que sur la division")
+    void refuseConversionQuiDeborde() {
+        // LE TROU RESTANT. Le correctif précédent a fermé ratio() dans les deux
+        // implémentations, mais convert() emprunte le même clean(), qui rend
+        // explicitement toute valeur non finie telle quelle. Sondé avant
+        // correctif : convert(1e308, "km", "m") rendait Infinity.
+        //
+        // Ce n'est pas un cas d'école : la valeur traverse l'API HTTP
+        // (POST /v1/agent/convert), où Jackson sérialise un double infini en la
+        // CHAÎNE JSON "Infinity". L'agent appelant reçoit un texte là où son
+        // schéma annonce un nombre — et tout calcul en aval devient faux en
+        // silence, au lieu d'échouer franchement.
+        ZeroDivisionMeasurementException e = assertThrows(
+                ZeroDivisionMeasurementException.class,
+                () -> Units.convert(1e308, "km", "m"));
+        assertTrue(e.getMessage().contains("dépassement"));
+    }
+
+    @Test
+    @DisplayName("refuse une conversion qui déborde par le facteur SI de la cible, pas par la valeur saisie")
+    void refuseConversionQuiDebordeParFacteur() {
+        // Second chemin vers le même défaut : 1e305 m3 n'a rien d'extrême pour
+        // un double, mais la cible mL (facteur 1e-6) divise par un millionième
+        // et pousse le résultat au-delà de Double.MAX_VALUE. C'est le débordement
+        // que la seule lecture de l'entrée ne permet pas d'anticiper — d'où une
+        // garde sur le RÉSULTAT et non sur la valeur saisie.
+        assertThrows(
+                ZeroDivisionMeasurementException.class,
+                () -> Units.convert(1e305, "m3", "mL"));
+    }
+
+    @Test
+    @DisplayName("refuse une valeur d'entrée non finie plutôt que de la propager")
+    void refuseEntreeNonFinie() {
+        // Sondé avant correctif : convert(NaN, "m", "km") rendait NaN. La porte
+        // d'entrée compte autant que la sortie — AgentController.asDouble()
+        // s'appuie sur Double.parseDouble(), qui accepte volontiers les chaînes
+        // "NaN" et "Infinity" : un client peut donc injecter du non-fini par le
+        // corps de la requête.
+        assertThrows(Units.UnitException.class, () -> Units.convert(Double.NaN, "m", "km"));
+        assertThrows(Units.UnitException.class, () -> Units.convert(Double.POSITIVE_INFINITY, "m", "km"));
+        assertThrows(Units.UnitException.class, () -> Units.ratio(Double.NaN, "m", 2, "m"));
+        assertThrows(Units.UnitException.class, () -> Units.ratio(2, "m", Double.NaN, "m"));
+    }
+
+    @Test
+    @DisplayName("laisse passer les conversions extrêmes mais représentables")
+    void accepteLesExtremesRepresentables() {
+        // La garde ne doit pas devenir un plafond arbitraire : tant que le
+        // résultat tient dans un double, la conversion reste due.
+        assertEquals(1e306d, Units.convert(1e300, "m3", "mL").value(), 1e291);
+        assertEquals(1e-12d, Units.convert(1e-6, "mm", "km").value(), 1e-24);
+    }
 }

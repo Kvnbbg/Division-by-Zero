@@ -1,0 +1,9 @@
+{
+  "name": "division-by-zero-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Convertisseur de mesures — refus explicite des résultats non représentables.",
+  "scripts": {
+    "test": "node --test web/js/*.test.js"
+  }
+}

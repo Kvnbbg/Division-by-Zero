@@ -64,6 +64,34 @@ class UnitsTest {
     }
 
     @Test
+    @DisplayName("refuse un rapport dont le résultat déborde en Infinity — pas de dénominateur nul requis")
+    void refuseRapportInfini() {
+        // LA FAILLE : le refus ne vérifiait que `bottom == 0d`. Un dénominateur
+        // réellement non nul, mais assez petit face au numérateur, fait
+        // déborder la division en Double.POSITIVE_INFINITY sans jamais passer
+        // par ce test — exactement ce que la classe dit refuser dans son
+        // propre Javadoc : « on ne renvoie ni Infinity, ni NaN ». Avant le
+        // correctif, cet appel rendait Infinity au lieu de lever.
+        ZeroDivisionMeasurementException e = assertThrows(
+                ZeroDivisionMeasurementException.class,
+                () -> Units.ratio(1e300, "m", 1e-300, "m"));
+        assertTrue(e.getMessage().contains("dépassement"));
+    }
+
+    @Test
+    @DisplayName("refuse un rapport qui déborde à cause du facteur SI de l'unité, pas seulement de la valeur brute")
+    void refuseRapportInfiniParFacteur() {
+        // Même défaut, par un autre chemin : le facteur SI de "mL" (1e-6)
+        // combiné à une valeur saisie qui, seule, n'a rien d'extrême, suffit à
+        // pousser le dénominateur assez bas pour faire déborder la division.
+        // Les deux unités partagent la dimension VOLUME : ce n'est pas un
+        // rapport entre dimensions incompatibles qui est testé ici.
+        assertThrows(
+                ZeroDivisionMeasurementException.class,
+                () -> Units.ratio(1e300, "m3", 1e-294, "mL"));
+    }
+
+    @Test
     @DisplayName("calcule un rapport sans dimension")
     void calculeRapport() {
         assertEquals(2d, Units.ratio(2, "km", 1000, "m"), 1e-9);

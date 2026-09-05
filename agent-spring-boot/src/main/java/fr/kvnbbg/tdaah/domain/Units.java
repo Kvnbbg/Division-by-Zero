@@ -167,6 +167,30 @@ public final class Units {
      *
      * <p>Le rapport est sans dimension, donc exprimable en nombre : c'est le seul
      * cas de division que l'agent expose, et c'est là que le refus s'applique.
+     *
+     * <p>LA FAILLE CORRIGÉE ICI — le refus ne portait que sur {@code bottom == 0d},
+     * une égalité flottante exacte. Un dénominateur réellement non nul, mais
+     * minuscule face au numérateur (ou rendu minuscule par le facteur SI de son
+     * unité, voir psi ≈ 6894,76), fait déborder la division en
+     * {@link Double#POSITIVE_INFINITY} ou {@link Double#NEGATIVE_INFINITY} sans
+     * jamais franchir ce test. Le portage JavaScript souffre du même défaut
+     * ({@code div()} dans web/js/convertisseur.js, et {@code clean()} qui laisse
+     * passer explicitement toute valeur non finie) : ce n'est pas une régression
+     * du portage, c'est le comportement d'origine, fidèlement reproduit.
+     *
+     * <p>Or c'est précisément ce que la classe {@link ZeroDivisionMeasurementException}
+     * dit refuser dans son propre Javadoc : « on ne renvoie ni Infinity, ni NaN,
+     * ni zéro par commodité ». Exposé à travers l'API HTTP de l'agent
+     * ({@code GET /v1/agent/ratio}), Jackson sérialise un double infini en la
+     * CHAÎNE JSON {@code "Infinity"} plutôt que de lever une erreur — un agent
+     * appelant qui attend un nombre reçoit un texte qui y ressemble, et un calcul
+     * en aval sur cette valeur produit un résultat silencieusement faux plutôt
+     * qu'un échec visible.
+     *
+     * <p>Le refus porte donc sur le RÉSULTAT, pas seulement sur l'entrée : un
+     * résultat non fini est refusé au même titre qu'un dénominateur nul, avec le
+     * même code d'erreur — l'appelant n'a pas à distinguer les deux cas, dans les
+     * deux cas la division n'a pas de résultat exploitable.
      */
     public static double ratio(double numerator, String numeratorUnit,
                                double denominator, String denominatorUnit) {
@@ -180,7 +204,13 @@ public final class Units {
         if (bottom == 0d) {
             throw new ZeroDivisionMeasurementException();
         }
-        return clean(toSi(numerator, a) / bottom);
+        double result = toSi(numerator, a) / bottom;
+        if (!Double.isFinite(result)) {
+            throw new ZeroDivisionMeasurementException(
+                    "résultat non représentable (dépassement de capacité) : le dénominateur n'est pas nul, "
+                            + "mais trop petit face au numérateur pour produire un rapport fini.");
+        }
+        return clean(result);
     }
 
     /** Symboles connus, dans l'ordre de déclaration. */

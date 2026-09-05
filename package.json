@@ -2,6 +2,8 @@
   "name": "division-by-zero-web",
   "version": "0.1.0",
   "private": true,
+  "author": "Kevin Marville — Tech & Stream (Kvnbbg)",
+  "license": "Apache-2.0",
   "description": "Convertisseur de mesures — refus explicite des résultats non représentables.",
   "scripts": {
     "test": "node --test web/js/*.test.js"

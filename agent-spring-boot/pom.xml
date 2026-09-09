@@ -13,7 +13,7 @@
   <artifactId>tdaah-agent</artifactId>
   <version>0.2.0</version>
   <name>TDAAH Agent</name>
-  <description>Measurement agent and batch data pipeline. Kevin Marville / Tech & Stream.</description>
+  <description>Measurement agent and batch data pipeline. Kevin Marville / Tech &amp; Stream.</description>
   <properties>
     <java.version>21</java.version>
   </properties>

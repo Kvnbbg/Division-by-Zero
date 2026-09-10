@@ -1,2 +1,43 @@
+# Agda
 *.agdai
 **/MAlonzo/**
+
+# Secrets — la première ligne de défense, et elle manquait.
+#
+# Ce dépôt n'excluait NI les fichiers d'environnement, NI les artefacts de
+# build. C'est exactement ainsi qu'un .env finit commité : rien ne l'arrête,
+# et une fois dans l'historique un secret y reste même après suppression du
+# fichier. Le dépôt « donation » de ce même compte en porte un, et la
+# détection de secrets de GitHub l'a signalé à Stripe — qui a suspendu les
+# virements le 14 août 2026.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+credentials.json
+
+# Build Java
+target/
+*.class
+*.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# Système et éditeurs
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Journaux
+*.log
+npm-debug.log*

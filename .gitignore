@@ -41,3 +41,17 @@ Thumbs.db
 # Journaux
 *.log
 npm-debug.log*
+
+# Support de présentation retiré de la publication
+#
+# docs/Instructions/« Division by Zero — Présentation du Projet.pdf » était
+# versionné dans ce dépôt PUBLIC. Sa diapositive 10 « Image Sources » liste
+# une image servie par as1.ftcdn.net — le CDN d'Adobe Stock — sous le préfixe
+# « 1000_F_ », qui désigne l'aperçu gratuit FILIGRANÉ et jamais un fichier
+# licencié. S'y ajoutent un visuel Dribbble et l'image sociale d'un dépôt
+# tiers, présentés dans un document signé « Tous droits réservés ».
+#
+# Le retirer du suivi arrête la diffusion. Il reste dans l'historique git :
+# purger celui-ci demande une réécriture et un force-push, décision qui
+# n'appartient qu'à l'auteur du dépôt.
+docs/Instructions/Division by Zero*.pdf

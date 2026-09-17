@@ -14,3 +14,7 @@ info:
     author: Kevin Marville
     brand: Tech & Stream
     site: https://techandstream.com
+tdaah:
+  native:
+    tools-dir: tools
+    timeout-seconds: 15

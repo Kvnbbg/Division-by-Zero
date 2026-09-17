@@ -1,28 +1,20 @@
-Projet de Présentation
+# Instructions
 
-Bienvenue dans ce dépôt. Vous trouverez ici la documentation complète, ainsi que la présentation associée au format .pptx.
+© 2026 Kevin Marville · [techandstream.com](https://techandstream.com) · [kvnbbg.fr](https://kvnbbg.fr) · [kvnbbg-creations.io](https://kvnbbg-creations.io)
 
-Description
+## Contenu
 
-Ce projet contient :
-Les ressources nécessaires à la compréhension du sujet.
-Les diapositives de la présentation professionnelle.
-Des instructions pour accéder aux supports complémentaires.
+| Fichier | Rôle |
+|---|---|
+| [Instruction_utilisation_Copernicus.pdf](./Instruction_utilisation_Copernicus.pdf) | Notice publique cybersécurité / exploitation |
+| [Datacenter_Guide_Kevin_Marville.pdf](./Datacenter_Guide_Kevin_Marville.pdf) | Guide datacenter |
+| [SIDE-HUSTLE-STATES.md](./SIDE-HUSTLE-STATES.md) | Machine à états OFFER → SYSTEM |
+| [DOCUMENTATION-CULTURE.md](./DOCUMENTATION-CULTURE.md) | Doc incomplète, culture générale, recalibrage |
 
-Contenu
+## Outil associé
 
-Documentation : Informations détaillées sur le projet.
-Diapositives : La présentation au format .pptx.
-Ressources supplémentaires : Liens et guides pour approfondir.
+- [`tools/ai_bootstrap.c`](../../tools/ai_bootstrap.c) — installateur léger `curl` (apt / brew / pacman / dnf / yum)
 
-Comment accéder à la présentation
+## Source narrative
 
-Pour visualiser la présentation complète, veuillez ouvrir le fichier suivant :
-
-Télécharger les diapositives
-
-Vous pouvez également retrouver ce contenu sur le site : techandstream.com
-
----
-
-© 2026 - Projet académique professionnel
+Notes issues de *Instructions d'utilisation Datacenter* (Wattpad — oldSoTrueLove), reprises en documents publics sans secrets d’infra.

@@ -18,3 +18,7 @@ tdaah:
   native:
     tools-dir: tools
     timeout-seconds: 15
+  security:
+    # Lab only. Set TDAAH_API_KEY in the environment; leave enabled=false for local open demo.
+    enabled: false
+    api-key: ${TDAAH_API_KEY:}

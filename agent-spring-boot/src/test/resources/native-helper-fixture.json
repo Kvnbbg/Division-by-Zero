@@ -1,0 +1,4 @@
+{
+  "allowlist": ["BUS_INVENTORY", "AI_BOOTSTRAP"],
+  "binaries": ["bus_inventory", "ai_bootstrap"]
+}

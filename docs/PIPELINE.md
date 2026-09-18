@@ -31,7 +31,7 @@ TDAAH batch jobs must **end**. They do not mint NFTs and they do not keep an LLM
 
 ## Engineering rules
 
-1. Named failure: a zero denominator in a ratio step raises `ZeroDivisionMeasurementException` (HTTP 422). No silent `Infinity`.
+1. Named numeric failure: the ratio transform rejects zero denominators and non-finite measurements. The batch path records these as refusals instead of emitting `Infinity` or `NaN`; the direct exercise API exposes zero-division as HTTP 422.
 2. Secrets only via environment (`TDAAH_SOURCE_PATH`, later `SPRING_DATASOURCE_*`). Never in Git.
 3. One transform, one metric. Counters: records in, records out, zero-division refusals.
 4. Batch contract: start timestamp, end timestamp, status `COMPLETED` or `FAILED`.

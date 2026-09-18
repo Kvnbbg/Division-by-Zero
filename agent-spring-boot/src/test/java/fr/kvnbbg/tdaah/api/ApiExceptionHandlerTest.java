@@ -48,6 +48,17 @@ class ApiExceptionHandlerTest {
     }
 
     @Test
+    @DisplayName("mesure non finie : 422 avec un code stable")
+    void mesureNonFinie() throws Exception {
+        mvc.perform(post("/v1/exercise-attempts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"numerator\":1e309,\"denominator\":2}"))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.error").value("non_finite_measurement"))
+                .andExpect(jsonPath("$.status").value(422));
+    }
+
+    @Test
     @DisplayName("division par zéro : 422, et jamais Infinity")
     void divisionParZero() throws Exception {
         mvc.perform(post("/v1/exercise-attempts")

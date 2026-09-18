@@ -33,7 +33,7 @@ public class SafeRatioTransform {
             PipelineModels.PipelineRecord in, String numeratorField, String denominatorField) {
         try {
             return apply(in, numeratorField, denominatorField);
-        } catch (ZeroDivisionMeasurementException | NonFiniteMeasurementException ex) {
+        } catch (ZeroDivisionMeasurementException | NonFiniteMeasurementException | NumberFormatException ex) {
             return Optional.empty();
         }
     }

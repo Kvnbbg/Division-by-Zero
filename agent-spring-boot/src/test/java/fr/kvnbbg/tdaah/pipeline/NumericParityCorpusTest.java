@@ -30,11 +30,17 @@ class NumericParityCorpusTest {
                         java.util.Map.of("numerator", numerator, "denominator", denominator));
 
                 switch (expected) {
-                    case "finite" -> assertEquals(
-                            c.path("value").asDouble(),
-                            transform.apply(record, "numerator", "denominator").orElseThrow().fields().get("ratio"),
-                            Math.abs(c.path("value").asDouble()) * 1e-12,
-                            id);
+                    case "finite" -> {
+                        Object actual = transform.apply(record, "numerator", "denominator")
+                                .orElseThrow()
+                                .fields()
+                                .get("ratio");
+                        assertEquals(
+                                c.path("value").asDouble(),
+                                ((Number) actual).doubleValue(),
+                                Math.max(1e-12, Math.abs(c.path("value").asDouble()) * 1e-12),
+                                id);
+                    }
                     case "zero_division" -> assertThrows(
                             ZeroDivisionMeasurementException.class,
                             () -> transform.apply(record, "numerator", "denominator"),

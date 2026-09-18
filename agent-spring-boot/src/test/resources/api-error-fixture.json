@@ -1,0 +1,8 @@
+{
+  "malformed_body": {"status": 400, "error": "malformed_body"},
+  "validation": {"status": 422, "error": "validation"},
+  "zero_division_measurement": {"status": 422, "error": "zero_division_measurement"},
+  "non_finite_measurement": {"status": 422, "error": "non_finite_measurement"},
+  "missing_parameter": {"status": 400, "error": "missing_parameter"},
+  "invalid_parameter": {"status": 400, "error": "invalid_parameter"}
+}

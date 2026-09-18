@@ -4,6 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +19,22 @@ class BatchPipelineTest {
     private final SafeRatioTransform transform = new SafeRatioTransform();
     private final SinkWriter writer = new SinkWriter();
     private final BatchPipeline pipeline = new BatchPipeline(reader, transform, writer);
+
+    @Test
+    @DisplayName("les sorties transformées restent alignées avec le contrat de données")
+    void transformedOutputMatchesFixture() throws Exception {
+        try (InputStream input =
+                getClass().getResourceAsStream("/pipeline-expected-output.json")) {
+            Map<String, List<Map<String, Double>>> fixture =
+                    new ObjectMapper().readValue(input, new TypeReference<>() {});
+
+            for (PipelineModels.SourceKind kind : PipelineModels.SourceKind.values()) {
+                PipelineModels.BatchResult result = pipeline.run(new PipelineModels.RunRequest(
+                        kind, PipelineModels.SinkKind.FILE, "distance", "hours"));
+                assertEquals(fixture.get(kind.name()), result.sample(), kind.name());
+            }
+        }
+    }
 
     @Test
     @DisplayName("un appel direct sans requête est refusé explicitement")

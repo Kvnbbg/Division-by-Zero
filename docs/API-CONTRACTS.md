@@ -1,0 +1,56 @@
+# Division-by-Zero — API contracts
+
+## Scope
+
+This document records the stable boundary between the Spring Boot agent, numerical pipeline and web client.
+
+## Error contract
+
+The current API error body contains:
+
+```json
+{
+  "error": "non_finite_measurement",
+  "message": "…",
+  "status": 422
+}
+```
+
+Known semantic categories include:
+
+- `zero_division_measurement` → 422
+- `non_finite_measurement` → 422
+- `validation` → 422
+- `malformed_body` → 400
+- `missing_parameter` → 400
+- `invalid_parameter` → 400
+
+Consumers should branch on `error` and `status`, not on localized message text.
+
+## Numeric contract
+
+A ratio operation must reject:
+
+- zero denominator;
+- negative zero denominator;
+- NaN numerator/denominator;
+- positive or negative infinity;
+- non-finite result.
+
+Finite results remain ordinary numeric responses.
+
+## Parity corpus
+
+The canonical corpus lives under:
+
+`agent-spring-boot/src/test/resources/numeric-parity.json`
+
+Java and browser tests consume the same semantic cases. The corpus is the source of truth for cross-runtime behavior.
+
+## API evolution
+
+1. Preserve existing success payload fields.
+2. Add error codes before introducing new transport shapes.
+3. Keep HTTP status and semantic error category aligned.
+4. Never serialize NaN or Infinity as a successful measurement.
+5. Document dimension/conversion failures separately from arithmetic failures.

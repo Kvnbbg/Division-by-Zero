@@ -1,6 +1,7 @@
 package fr.kvnbbg.tdaah.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,8 +43,9 @@ class ApiErrorConfirmationWebTest {
     @Test
     @DisplayName("un corps JSON illisible conserve aussi la corrélation")
     void malformedBodyConfirmsCorrelationId() throws Exception {
-        mvc.perform(get("/v1/audit/events")
-                        .param("limit", "not-a-number")
+        mvc.perform(post("/v1/pipeline/run")
+                        .contentType("application/json")
+                        .content("{not-json}")
                         .header("X-Correlation-Id", "audit-malformed"))
                 .andExpect(status().isBadRequest())
                 .andExpect(header().string("X-Correlation-Id", "audit-malformed"))

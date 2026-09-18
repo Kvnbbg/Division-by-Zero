@@ -61,6 +61,12 @@ class SafeRatioTransformTest {
     }
 
     @Test
+    void applyOrSkipSkipsMalformedNumericText() {
+        var record = new PipelineModels.PipelineRecord(Map.of("numerator", "not-a-number", "denominator", 2.0));
+        assertEquals(java.util.Optional.empty(), transform.applyOrSkip(record, "numerator", "denominator"));
+    }
+
+    @Test
     void applyOrSkipSkipsNonFiniteAndZero() {
         var record = new PipelineModels.PipelineRecord(Map.of("numerator", 1.0, "denominator", 0.0));
         assertEquals(java.util.Optional.empty(), transform.applyOrSkip(record, "numerator", "denominator"));

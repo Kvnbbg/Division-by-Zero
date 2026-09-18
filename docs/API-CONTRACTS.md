@@ -28,9 +28,12 @@ The current API error body contains:
 {
   "error": "non_finite_measurement",
   "message": "…",
-  "status": 422
+  "status": 422,
+  "correlationId": "request-scoped-id"
 }
 ```
+
+`correlationId` confirms the same request identifier returned by `X-Correlation-Id`.
 
 Known semantic categories include:
 

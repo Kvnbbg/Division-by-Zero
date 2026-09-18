@@ -13,6 +13,13 @@ This document records the stable boundary between the Spring Boot agent, numeric
 - GET /v1/pipeline/kinds exposes the supported source and sink kinds.
 - X-Correlation-Id is echoed when it matches the safe correlation-id format; otherwise a new identifier is generated.
 
+## Agent and device surfaces
+
+- GET /v1/agent/tools is a read-only capability registry. It does not execute a tool.
+- GET /v1/device/helpers exposes the native-helper allowlist.
+- GET /v1/device/bus delegates only to NativeBridge.Helper.BUS_INVENTORY.
+- Native helper execution remains allowlisted and bounded by the bridge timeout; controller tests mock the bridge rather than invoking host binaries.
+
 ## Error contract
 
 The current API error body contains:

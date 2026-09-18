@@ -12,13 +12,20 @@ public class SafeRatioTransform {
             PipelineModels.PipelineRecord in, String numeratorField, String denominatorField) {
         Object num = in.fields().get(numeratorField);
         Object den = in.fields().get(denominatorField);
-        double n = toDouble(num);
-        double d = toDouble(den);
+        double n = toFiniteDouble(num, numeratorField);
+        double d = toFiniteDouble(den, denominatorField);
+
         if (d == 0.0d) {
             throw new ZeroDivisionMeasurementException(denominatorField);
         }
+
+        double ratio = n / d;
+        if (!Double.isFinite(ratio)) {
+            throw new NonFiniteMeasurementException("ratio", ratio);
+        }
+
         Map<String, Object> out = new LinkedHashMap<>(in.fields());
-        out.put("ratio", n / d);
+        out.put("ratio", ratio);
         return Optional.of(new PipelineModels.PipelineRecord(out));
     }
 
@@ -26,18 +33,26 @@ public class SafeRatioTransform {
             PipelineModels.PipelineRecord in, String numeratorField, String denominatorField) {
         try {
             return apply(in, numeratorField, denominatorField);
-        } catch (ZeroDivisionMeasurementException ex) {
+        } catch (ZeroDivisionMeasurementException | NonFiniteMeasurementException ex) {
             return Optional.empty();
         }
     }
 
-    private static double toDouble(Object value) {
-        if (value instanceof Number number) {
-            return number.doubleValue();
-        }
+    private static double toFiniteDouble(Object value, String field) {
         if (value == null) {
-            return 0.0d;
+            throw new NonFiniteMeasurementException(field, Double.NaN);
         }
-        return Double.parseDouble(value.toString());
+
+        final double parsed;
+        if (value instanceof Number number) {
+            parsed = number.doubleValue();
+        } else {
+            parsed = Double.parseDouble(value.toString());
+        }
+
+        if (!Double.isFinite(parsed)) {
+            throw new NonFiniteMeasurementException(field, parsed);
+        }
+        return parsed;
     }
 }

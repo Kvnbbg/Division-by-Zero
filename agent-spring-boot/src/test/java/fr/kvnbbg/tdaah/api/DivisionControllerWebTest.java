@@ -36,8 +36,10 @@ class DivisionControllerWebTest {
 
         mvc.perform(post("/v1/exercise-attempts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"numerator\":1,\"denominator\":0}"))
+                .content("{\"numerator\":1,\"denominator\":0}")
+                .header("X-Correlation-Id", "exercise-42"))
             .andExpect(status().isUnprocessableEntity())
+            .andExpect(header().string("X-Correlation-Id", "exercise-42"))
             .andExpect(jsonPath("$.status").value("UNDEFINED"))
             .andExpect(jsonPath("$.value").doesNotExist())
             .andExpect(jsonPath("$.gameplayEvent").value("NULL_RIFT_UNDEFINED"));

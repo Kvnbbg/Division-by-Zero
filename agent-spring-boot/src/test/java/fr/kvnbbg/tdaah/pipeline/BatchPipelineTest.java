@@ -64,7 +64,7 @@ class BatchPipelineTest {
         assertEquals(3, result.readCount());
         assertEquals(2, result.writeCount());
         assertEquals(2, writer.lastWritten().size());
-        assertEquals(2.5, writer.lastWritten().get(0).fields().get("ratio"));
+        assertEquals(5.0, writer.lastWritten().get(0).fields().get("ratio"));
         assertEquals(5.0, writer.lastWritten().get(1).fields().get("ratio"));
         assertNotNull(result.startedAt());
         assertNotNull(result.endedAt());

@@ -33,6 +33,32 @@ class BatchPipelineTest {
     }
 
     @Test
+    @DisplayName("une mesure textuelle invalide est refusée sans interrompre le batch")
+    void malformedMeasurementIsRefused() {
+        PipelineModels.PipelineRecord malformed = new PipelineModels.PipelineRecord(
+                java.util.Map.of("distance", "not-a-number", "hours", 2.0));
+        java.util.List<PipelineModels.PipelineRecord> records = java.util.List.of(malformed);
+        SourceReader customReader = new SourceReader() {
+            @Override
+            public java.util.List<PipelineModels.PipelineRecord> read(PipelineModels.SourceKind kind) {
+                return records;
+            }
+        };
+        BatchPipeline customPipeline = new BatchPipeline(customReader, transform, writer);
+
+        PipelineModels.BatchResult result = customPipeline.run(new PipelineModels.RunRequest(
+                PipelineModels.SourceKind.FILE,
+                PipelineModels.SinkKind.FILE,
+                "distance",
+                "hours"));
+
+        assertEquals(PipelineModels.JobStatus.FAILED, result.status());
+        assertEquals(1, result.readCount());
+        assertEquals(0, result.writeCount());
+        assertEquals(0, writer.lastWritten().size());
+    }
+
+    @Test
     @DisplayName("JDBC et API gardent leurs chemins de source sans modifier le contrat")
     void otherSources() {
         PipelineModels.BatchResult jdbc = pipeline.run(new PipelineModels.RunRequest(

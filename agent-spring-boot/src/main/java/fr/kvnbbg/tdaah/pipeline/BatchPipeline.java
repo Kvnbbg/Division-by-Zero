@@ -19,6 +19,10 @@ public class BatchPipeline {
     }
 
     public PipelineModels.BatchResult run(PipelineModels.RunRequest request) {
+        if (request == null || request.source() == null || request.sink() == null) {
+            throw new IllegalArgumentException("source and sink are required");
+        }
+
         Instant start = Instant.now();
         String num = request.numeratorField() == null ? "distance" : request.numeratorField();
         String den = request.denominatorField() == null ? "hours" : request.denominatorField();

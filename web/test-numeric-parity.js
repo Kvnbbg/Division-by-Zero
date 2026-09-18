@@ -5,7 +5,7 @@ const path = require("node:path");
 const TDAAH = require("./js/convertisseur.js");
 
 const corpus = JSON.parse(fs.readFileSync(
-  path.join(__dirname, "..", "test-fixtures", "numeric-parity.json"), "utf8"
+  path.join(__dirname, "..", "agent-spring-boot", "src", "test", "resources", "numeric-parity.json"), "utf8"
 ));
 
 const toNumber = value => typeof value === "string" ? Number(value) : value;

@@ -1,0 +1,13 @@
+{
+  "FILE": [
+    {"distance": 10.0, "hours": 2.0},
+    {"distance": 5.0, "hours": 1.0},
+    {"distance": 3.0, "hours": 0.0}
+  ],
+  "JDBC": [
+    {"distance": 42.0, "hours": 6.0}
+  ],
+  "API": [
+    {"distance": 100.0, "hours": 4.0}
+  ]
+}

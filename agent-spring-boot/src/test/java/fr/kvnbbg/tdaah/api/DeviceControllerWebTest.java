@@ -45,8 +45,7 @@ class DeviceControllerWebTest {
     @DisplayName("l'inventaire bus délègue uniquement au helper prévu")
     void busContract() throws Exception {
         when(nativeBridge.run(NativeBridge.Helper.BUS_INVENTORY))
-                .thenReturn(Map.of("ok", true, "helper", "bus_inventory", "exitCode", 0, "output", "ok
-"));
+                .thenReturn(Map.of("ok", true, "helper", "bus_inventory", "exitCode", 0, "output", "ok\\n"));
 
         mvc.perform(get("/v1/device/bus").header("X-Correlation-Id", "device-bus"))
                 .andExpect(status().isOk())

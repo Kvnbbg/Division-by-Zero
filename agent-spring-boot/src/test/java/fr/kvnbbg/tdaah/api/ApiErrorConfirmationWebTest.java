@@ -37,3 +37,15 @@ class ApiErrorConfirmationWebTest {
                 .andExpect(jsonPath("$.correlationId").value("audit-error-1"));
     }
 }
+
+
+    @Test
+    @DisplayName("un corps JSON illisible conserve aussi la corrélation")
+    void malformedBodyConfirmsCorrelationId() throws Exception {
+        mvc.perform(get("/v1/audit/events")
+                        .param("limit", "not-a-number")
+                        .header("X-Correlation-Id", "audit-malformed"))
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string("X-Correlation-Id", "audit-malformed"))
+                .andExpect(jsonPath("$.correlationId").value("audit-malformed"));
+    }

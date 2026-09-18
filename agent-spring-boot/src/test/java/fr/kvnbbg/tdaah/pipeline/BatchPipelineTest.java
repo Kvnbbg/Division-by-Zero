@@ -2,6 +2,7 @@ package fr.kvnbbg.tdaah.pipeline;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,21 @@ class BatchPipelineTest {
     private final SafeRatioTransform transform = new SafeRatioTransform();
     private final SinkWriter writer = new SinkWriter();
     private final BatchPipeline pipeline = new BatchPipeline(reader, transform, writer);
+
+    @Test
+    @DisplayName("un appel direct sans requête est refusé explicitement")
+    void missingRequestIsRejected() {
+        assertThrows(IllegalArgumentException.class, () -> pipeline.run(null));
+    }
+
+    @Test
+    @DisplayName("un appel direct sans source est refusé explicitement")
+    void missingSourceIsRejected() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> pipeline.run(new PipelineModels.RunRequest(
+                        null, PipelineModels.SinkKind.FILE, "distance", "hours")));
+    }
 
     @Test
     @DisplayName("le batch FILE conserve les lignes valides et refuse le zéro")

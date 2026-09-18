@@ -2,6 +2,7 @@ package fr.kvnbbg.tdaah.api;
 
 import fr.kvnbbg.tdaah.pipeline.BatchPipeline;
 import fr.kvnbbg.tdaah.pipeline.PipelineModels;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,8 @@ public class PipelineController {
     }
 
     @PostMapping("/run")
-    public ResponseEntity<PipelineModels.BatchResult> run(@RequestBody(required = false) PipelineModels.RunRequest request) {
+    public ResponseEntity<PipelineModels.BatchResult> run(
+            @Valid @RequestBody(required = false) PipelineModels.RunRequest request) {
         PipelineModels.RunRequest safe = request == null
                 ? new PipelineModels.RunRequest(
                         PipelineModels.SourceKind.FILE,

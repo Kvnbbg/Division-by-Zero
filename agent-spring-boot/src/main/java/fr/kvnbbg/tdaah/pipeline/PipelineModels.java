@@ -1,5 +1,6 @@
 package fr.kvnbbg.tdaah.pipeline;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,8 +29,8 @@ public final class PipelineModels {
     }
 
     public record RunRequest(
-            SourceKind source,
-            SinkKind sink,
+            @NotNull SourceKind source,
+            @NotNull SinkKind sink,
             String numeratorField,
             String denominatorField) {}
 

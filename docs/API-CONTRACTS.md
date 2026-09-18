@@ -4,6 +4,15 @@
 
 This document records the stable boundary between the Spring Boot agent, numerical pipeline and web client.
 
+## Pipeline boundary
+
+- POST /v1/pipeline/run starts one short-lived batch.
+- An absent request body preserves the historical defaults: FILE -> FILE, distance / hours.
+- When a request body is supplied, source and sink are required. Explicit null values return 422 validation before the batch executes.
+- Unknown enum values or unreadable JSON return 400 malformed_body.
+- GET /v1/pipeline/kinds exposes the supported source and sink kinds.
+- X-Correlation-Id is echoed when it matches the safe correlation-id format; otherwise a new identifier is generated.
+
 ## Error contract
 
 The current API error body contains:
@@ -18,14 +27,14 @@ The current API error body contains:
 
 Known semantic categories include:
 
-- `zero_division_measurement` → 422
-- `non_finite_measurement` → 422
-- `validation` → 422
-- `malformed_body` → 400
-- `missing_parameter` → 400
-- `invalid_parameter` → 400
+- zero_division_measurement -> 422
+- non_finite_measurement -> 422
+- validation -> 422
+- malformed_body -> 400
+- missing_parameter -> 400
+- invalid_parameter -> 400
 
-Consumers should branch on `error` and `status`, not on localized message text.
+Consumers should branch on error and status, not on localized message text.
 
 ## Numeric contract
 
@@ -43,7 +52,7 @@ Finite results remain ordinary numeric responses.
 
 The canonical corpus lives under:
 
-`agent-spring-boot/src/test/resources/numeric-parity.json`
+agent-spring-boot/src/test/resources/numeric-parity.json
 
 Java and browser tests consume the same semantic cases. The corpus is the source of truth for cross-runtime behavior.
 

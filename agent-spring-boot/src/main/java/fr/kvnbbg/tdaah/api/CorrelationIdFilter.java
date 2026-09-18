@@ -13,6 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class CorrelationIdFilter extends OncePerRequestFilter {
 
     public static final String HEADER = "X-Correlation-Id";
+    public static final String REQUEST_ATTRIBUTE = CorrelationIdFilter.class.getName() + ".id";
 
     @Override
     protected void doFilterInternal(
@@ -23,6 +24,7 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
         String correlationId = isSafeId(supplied) ? supplied : UUID.randomUUID().toString();
 
         response.setHeader(HEADER, correlationId);
+        request.setAttribute(REQUEST_ATTRIBUTE, correlationId);
         filterChain.doFilter(request, response);
     }
 

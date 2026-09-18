@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
+
 import fr.kvnbbg.tdaah.audit.AuditService;
 
 @WebMvcTest(AuditController.class)
@@ -37,8 +38,6 @@ class ApiErrorConfirmationWebTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.correlationId").value("audit-error-1"));
     }
-}
-
 
     @Test
     @DisplayName("un corps JSON illisible conserve aussi la corrélation")
@@ -51,3 +50,4 @@ class ApiErrorConfirmationWebTest {
                 .andExpect(header().string("X-Correlation-Id", "audit-malformed"))
                 .andExpect(jsonPath("$.correlationId").value("audit-malformed"));
     }
+}

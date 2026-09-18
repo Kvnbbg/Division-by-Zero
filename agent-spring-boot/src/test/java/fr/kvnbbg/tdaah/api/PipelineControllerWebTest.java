@@ -112,6 +112,20 @@ class PipelineControllerWebTest {
                 .andExpect(jsonPath("$.status").value(400));
     }
 
+    @Test
+    @DisplayName("une source nulle est rejetée avant le batch")
+    void runSourceNulle() throws Exception {
+        mvc.perform(post("/v1/pipeline/run")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"source":null,"sink":"FILE","numeratorField":"distance","denominatorField":"hours"}
+                                """))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.error").value("validation"))
+                .andExpect(jsonPath("$.status").value(422))
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("source")));
+    }
+
     private static PipelineModels.BatchResult result() {
         Instant start = Instant.parse("2026-09-18T08:00:00Z");
         Instant end = Instant.parse("2026-09-18T08:00:01Z");

@@ -31,12 +31,12 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(ZeroDivisionMeasurementException.class)
-    public ResponseEntity<Map<String, Object>> onZeroDivision(ZeroDivisionMeasurementException e) {
+    public ResponseEntity<Map<String, Object>> onZeroDivision(ZeroDivisionMeasurementException e, HttpServletRequest request) {
         return reponse(HttpStatus.UNPROCESSABLE_ENTITY, "zero_division_measurement", e.getMessage(), request);
     }
 
     @ExceptionHandler(NonFiniteMeasurementException.class)
-    public ResponseEntity<Map<String, Object>> onNonFinite(NonFiniteMeasurementException e) {
+    public ResponseEntity<Map<String, Object>> onNonFinite(NonFiniteMeasurementException e, HttpServletRequest request) {
         return reponse(HttpStatus.UNPROCESSABLE_ENTITY, "non_finite_measurement", e.getMessage(), request);
     }
 

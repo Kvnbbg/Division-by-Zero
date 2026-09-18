@@ -1,0 +1,5 @@
+{
+  "correlationHeader": "X-Correlation-Id",
+  "correlationBodyField": "correlationId",
+  "sampleId": "audit-error-1"
+}

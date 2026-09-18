@@ -1,17 +1,47 @@
 name: Power Gate
+
 on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   verify:
+    name: Spring Boot + web contract
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+
+      - uses: actions/setup-java@v4
         with:
-          python-version: "3.12"
-      - run: python -m compileall web
-      - run: test -f web/index.html
-      - run: test -f NOTICE
-      - run: test -f LICENSE
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Test Spring Boot backend
+        working-directory: agent-spring-boot
+        run: mvn -B test
+
+      - name: Package Spring Boot backend
+        working-directory: agent-spring-boot
+        run: mvn -B package -DskipTests
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Test browser numeric parity
+        working-directory: web
+        run: node --test test-numeric-parity.js
+
+      - name: Verify repository contracts
+        run: |
+          test -f agent-spring-boot/pom.xml
+          test -f agent-spring-boot/src/main/java/fr/kvnbbg/tdaah/TdaahApplication.java
+          test -f agent-spring-boot/src/test/resources/numeric-parity.json
+          test -f web/index.html
+          test -f web/js/convertisseur.js
+          test -f LICENSE
+          test -f NOTICE

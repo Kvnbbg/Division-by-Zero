@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "cases": [
+    {"id":"finite-ratio","numerator":10.0,"denominator":4.0,"expected":"finite","value":2.5},
+    {"id":"zero-denominator","numerator":1.0,"denominator":0.0,"expected":"zero_division"},
+    {"id":"negative-zero-denominator","numerator":1.0,"denominator":-0.0,"expected":"zero_division"},
+    {"id":"indeterminate-zero-zero","numerator":0.0,"denominator":0.0,"expected":"zero_division"},
+    {"id":"nan-numerator","numerator":"NaN","denominator":2.0,"expected":"non_finite_operand"},
+    {"id":"positive-infinity-numerator","numerator":"Infinity","denominator":2.0,"expected":"non_finite_operand"},
+    {"id":"negative-infinity-denominator","numerator":1.0,"denominator":"-Infinity","expected":"non_finite_operand"},
+    {"id":"overflowing-ratio","numerator":1e308,"denominator":1e-308,"expected":"non_finite_result"},
+    {"id":"large-finite-ratio","numerator":1e308,"denominator":1e10,"expected":"finite","value":1e298},
+    {"id":"underflowing-ratio","numerator":1e-308,"denominator":1e308,"expected":"finite","value":0.0}
+  ]
+}
